@@ -26,6 +26,9 @@ public class TacticalAgentMovement : MonoBehaviour
 
     private List<(Vector3 pos, float score)> lastEvaluatedCandidates;
 
+    private TacticalRole currentRole = TacticalRole.Default;
+    public TacticalRole CurrentRole => currentRole;
+
     void Awake()
     {
         navAgent = GetComponent<NavMeshAgent>();
@@ -90,7 +93,33 @@ public class TacticalAgentMovement : MonoBehaviour
         }
     }
 
-    private void OGizmosSelected()
+
+    /// <summary>
+    /// Called by SquadCoordinator to assign new tactical instructions
+    /// </summary>
+    public void SetTacticalRole(TacticalRole role)
+    {
+        currentRole = role;
+
+        switch (currentRole)
+        {
+            case TacticalRole.Flanker:
+                searchRadius = 15f; // Wider search radius
+                scoreThresholdDelta = 0.1f; // respond faster
+                break;
+            case TacticalRole.Suppressor:
+                searchRadius = 8f;
+                scoreThresholdDelta = 0.25f; // Hold cover
+                break;
+            case TacticalRole.Default:
+            default:
+                searchRadius = 10f;
+                scoreThresholdDelta = 0.2f;
+                break;
+        }
+    }
+
+    private void OnDrawGizmosSelected()
     {
         if (!showDebugGizmos || !Application.isPlaying) return;
 

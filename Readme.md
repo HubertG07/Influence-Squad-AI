@@ -34,6 +34,7 @@ Breakdown of the time invested during development
 | --- | --- | --- | --- |
 | **14th Sept 2026** | 11:25-12:47 | 1 hour 22 mins | Grid coordinate math & Burst Jobs |
 | **15th Sept 2026** | 12:36-13:45 & 14:50-15:50 | 2 hour 9 mins | Batched raycast physics for cover & line of sight occlusion |
+| **16th Sept 2026** | 19:00-20:30 | TBD | Squad Coordinator & Utility Engine |
 | **Future** | TBD | TBD | Squad Manager Integreation & target cell query | 
 
 * **Project Start Date:** September 14th 2026
