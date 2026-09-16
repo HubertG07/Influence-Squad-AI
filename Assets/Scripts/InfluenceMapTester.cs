@@ -70,10 +70,7 @@ public class InfluenceMapTester : MonoBehaviour
             maxAngle,
             activeAllySlice
         );
-    }
 
-    void LateUpdate()
-    {
         updateHandle.Complete();
     }
 
