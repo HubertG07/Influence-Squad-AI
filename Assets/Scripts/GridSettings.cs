@@ -58,4 +58,22 @@ public struct GridSettings
         int z = math.clamp((int)math.floor((worldPosition.z - worldOrigin.z) / cellSize), 0, height - 1);
         return GridToIndex(x, z);
     }
+
+    /// <summary>
+    /// Convert a World Space Position into 2D Grid Coordinates
+    /// </summary>
+    public readonly Vector2Int WorldToGrid(Vector3 worldPosition)
+    {
+        int x = math.clamp((int)math.floor((worldPosition.x - worldOrigin.x) / cellSize), 0, width - 1);
+        int z = math.clamp((int)math.floor((worldPosition.z - worldOrigin.z) / cellSize), 0, height - 1);
+        return new Vector2Int(x, z);
+    }
+
+    /// <summary>
+    /// Check if grid coordinates and within bounds
+    /// </summary>
+    public readonly bool IsValidGridPosition(int x, int z)
+    {
+        return x >= 0 && x < width && z >= 0 && z < height;
+    }
 }

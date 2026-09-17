@@ -23,13 +23,17 @@ public class InfluenceGridManager : MonoBehaviour, IDisposable
     private NativeArray<float> allyDensityMap;
     private NativeArray<float> combinedMap;
 
+    public NativeArray<float> ThreatMap => threatMap;
+    public NativeArray<float> CoverMap => coverMap;
+    public NativeArray<float> AllyDensityMap => allyDensityMap;
+    public NativeArray<float> CombinedMap => combinedMap;
+
     private NativeArray<RaycastCommand> raycastCommands;
     private NativeArray<RaycastHit> raycastResults;
     private NativeArray<RaycastCommand> threatRayCommands;
     private NativeArray<RaycastHit> threatRayResults;
 
     public GridSettings Settings => gridSettings;
-    public NativeArray<float> CombinedMap => combinedMap;
     
 
     void Awake()
@@ -114,20 +118,32 @@ public class InfluenceGridManager : MonoBehaviour, IDisposable
         };
         JobHandle threatHandle = threatJob.Schedule(gridSettings.TotalCells, 64);
 
+        float3 agentEyeOffset = new float3(0f, 1.2f, 0f);
+        float3 threatEyePos = (float3)threatPos + agentEyeOffset;
+
         for (int i = 0; i < totalCells; i++)
         {
             int2 gridPos = gridSettings.IndexToGrid(i);
-            float3 cellPos = gridSettings.GridToWorld(gridPos.x, gridPos.y);
+            float3 cellPos = gridSettings.GridToWorld(gridPos.x, gridPos.y) + agentEyeOffset;
 
-            float3 dir = cellPos - (float3)threatPos;
+            float3 dir = threatEyePos - cellPos;
             float dist = math.length(dir);
 
             if (dist > 0.001f)
             {
-                threatRayCommands[i] = new RaycastCommand(threatPos, math.normalize(dir), queryParams, dist);
+                raycastCommands[i] = new RaycastCommand(cellPos, math.normalize(dir), queryParams, dist);
+                threatRayCommands[i] = new RaycastCommand(threatPos, math.normalize(cellPos - (float3)threatPos), queryParams, dist);
             }
         }
+        JobHandle coverRayHandle = RaycastCommand.ScheduleBatch(raycastCommands, raycastResults, 64, threatHandle);
         JobHandle threatRayHandle = RaycastCommand.ScheduleBatch(threatRayCommands, threatRayResults, 64, threatHandle);
+
+        var processCoverJob = new ProcessTacticalCoverJob
+        {
+            coverRaycastResults = raycastResults,
+            coverMap = coverMap
+        };
+        JobHandle coverHandle = processCoverJob.Schedule(totalCells, 64, coverRayHandle);
 
         var occlusionJob = new ProcessThreatOcclusionJob
         {
@@ -147,7 +163,7 @@ public class InfluenceGridManager : MonoBehaviour, IDisposable
 
 
         // Combind the jobs depending on occlusion and ally jobs finishing
-        JobHandle combinedDependency = JobHandle.CombineDependencies(occlusionHandle, allyHandle);
+        JobHandle combinedDependency = JobHandle.CombineDependencies(JobHandle.CombineDependencies(occlusionHandle, coverHandle), allyHandle);
 
         // Map the combination job
         var combineJob = new CombineMapsJob

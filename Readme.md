@@ -28,6 +28,7 @@ The **AI Squad Manager** provides tactical spatial awareness for AI agents. Rath
   * [Stage 2: Agent Movement & Spatial Query API](#stage-2-agent-movement-spatital-query-api)
   * [Stage 3: Squad Coordinator & Utility Engine](#stage-3-squad-coordinator-utility-engine)
   * [Stage 4: Agent State Machine](#stage-4-agent-state-machine)
+  * [Stage 5: Unity Editor Tools](#stage-5-unity-editor-tools)
 * [Challenges & Optimization Hurdles](#challenges--optimization-hurdles)
 * [Takeaways & Key Learnings](#takeaways--key-learnings)
 * [How to Run & Usage](#how-to-run--usage)
@@ -39,12 +40,12 @@ Breakdown of the time invested during development
 | **14th Sept 2026** | 11:25-12:47 | 1 hour 22 mins | Grid coordinate math & Burst Jobs |
 | **15th Sept 2026** | 12:36-13:45 & 14:50-15:50 | 2 hour 9 mins | Batched raycast physics for cover & line of sight occlusion |
 | **16th Sept 2026** | 19:00-20:30 | 1 hour 30 mins | Squad Coordinator & Utility Engine |
-| **17th Sept 2026** | 12:40- | TBD | State Machines & Combat Behaviours |
-| **Future** | TBD | TBD | Squad Manager Integreation & target cell query | 
+| **17th Sept 2026** | 12:40-14:46 | 2 hrs 6 mins | State Machines, Combat Behaviours & Unity Editor Tools Menu |
+| **Future** | TBD | TBD | Make the editor tools work & update the AI to improve it | 
 
 * **Project Start Date:** September 14th 2026
 * **Project Finish Date:** Not finished yet
-* **Current Total Time:** 5 hrs 01 mins Hours (Ongoing)
+* **Current Total Time:** 7 hrs 07 mins Hours (Ongoing)
 ---
 
 ## Technical Breakdown & Architecture
@@ -88,6 +89,11 @@ Currently the pipeline operates on a modular, data-oriented workflow
     * **Suppressor:** Locks body rotation directly towards the threat vector.
     * **Flanker:** Aligns body rotation along the active movement velocity vector.
     * **Seeking Cover:** Smoothly rotates toward the threat position.
+
+### Stage 5: Unity Editor Tools
+* **Objective:** Provide a runtime debugging visual, heatmap inspector tools, and Unity Editor menu extensions for real time debugging.
+* **Technical Overview:**
+  * **Real Time Heatmap Visualizer:** `OnDrawGizmos()` to render the active heatmaps (`Combined`, `Threat`, `Cover`, `AllyDensity`) in the scene view.
 ---
 
 ## Challenges & Optimization Hurdles

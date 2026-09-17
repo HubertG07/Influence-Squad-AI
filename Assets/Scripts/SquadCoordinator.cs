@@ -11,7 +11,7 @@ public class SquadCoordinator : MonoBehaviour
     [SerializeField] private Transform threatTransform;
 
     [Header("Squad Settings")]
-    [SerializeField] private List<TacticalAgentMovement> squadMembers = new List<TacticalAgentMovement>();
+    public List<TacticalAgentMovement> squadMembers = new List<TacticalAgentMovement>();
     [SerializeField] private float assessmentInterval = 0.5f;
     [SerializeField] private float roleChangeCooldown = 3.0f; // Timer to prevent role flickering
 
@@ -20,6 +20,8 @@ public class SquadCoordinator : MonoBehaviour
     private Dictionary<TacticalAgentMovement, float> roleChangeTimers = new Dictionary<TacticalAgentMovement, float>();
 
     private NativeArray<float3> memberPositionsBuffer;
+
+    public SquadTaticalContext LastTacticalContext => currentContext;
 
     void Awake()
     {

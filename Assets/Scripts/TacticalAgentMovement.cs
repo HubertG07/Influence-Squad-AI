@@ -24,6 +24,9 @@ public class TacticalAgentMovement : MonoBehaviour
     private float nextRepathTime;
     private bool isMovingToTarget = false;
 
+    public bool HasTargetDestination => isMovingToTarget;
+    public Vector3 TargetDestination => currentTargetPosition;
+
     private List<(Vector3 pos, float score)> lastEvaluatedCandidates;
 
     private TacticalRole currentRole = TacticalRole.Default;

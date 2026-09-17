@@ -50,6 +50,7 @@ public struct SquadTaticalContext
     public float retreatUtility;
     public float flankUtlity;
     public float supressUtility;
+    public float SquadClusteringScore;
 }
 
 // I really dont wanna make a new file for one enum

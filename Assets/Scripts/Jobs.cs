@@ -130,6 +130,20 @@ public struct ProcessCoverRaycastsJob : IJobParallelFor
 }
 
 [BurstCompile(CompileSynchronously = true)]
+public struct ProcessTacticalCoverJob : IJobParallelFor
+{
+    [ReadOnly] public NativeArray<RaycastHit> coverRaycastResults;
+    [WriteOnly] public NativeArray<float> coverMap;
+
+    public void Execute(int index)
+    {
+        // If the raycast from the cell towards the threat hits an obstacle
+        bool hitObstacle = coverRaycastResults[index].colliderEntityId != default;
+        coverMap[index] = hitObstacle ? 1.0f : 0.0f;
+    }
+}
+
+[BurstCompile(CompileSynchronously = true)]
 public struct ProcessThreatOcclusionJob : IJobParallelFor
 {
     [ReadOnly] public NativeArray<RaycastHit> threatRaycastResults;
