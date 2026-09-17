@@ -15,10 +15,6 @@ public class SquadCoordinator : MonoBehaviour
     [SerializeField] private float assessmentInterval = 0.5f;
     [SerializeField] private float roleChangeCooldown = 3.0f; // Timer to prevent role flickering
 
-    [Header("Utility Balancing Weights")]
-    [SerializeField] private float threatProximityWeight = 1.0f;
-    [SerializeField] private float healthWeight = 1.0f;
-
     private float nextAssessmentTime;
     private SquadTaticalContext currentContext;
     private Dictionary<TacticalAgentMovement, float> roleChangeTimers = new Dictionary<TacticalAgentMovement, float>();

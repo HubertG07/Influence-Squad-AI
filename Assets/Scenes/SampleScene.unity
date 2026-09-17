@@ -524,13 +524,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 111367329}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 2.75, y: 1, z: 3.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &310236907
 GameObject:
   m_ObjectHideFlags: 0
@@ -921,6 +921,7 @@ GameObject:
   - component: {fileID: 656741887}
   - component: {fileID: 656741892}
   - component: {fileID: 656741891}
+  - component: {fileID: 656741893}
   m_Layer: 0
   m_Name: Ally 1 (1)
   m_TagString: Untagged
@@ -1064,6 +1065,20 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &656741893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656741886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 302312cd029aa934baae2d2f2fefa2c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AgentStateMachine
+  querySystem: {fileID: 8438924}
+  threatTransform: {fileID: 111367333}
 --- !u!1 &760485491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1101,8 +1116,6 @@ MonoBehaviour:
   - {fileID: 656741891}
   assessmentInterval: 0.5
   roleChangeCooldown: 3
-  threatProximityWeight: 1
-  healthWeight: 1
 --- !u!4 &760485493
 Transform:
   m_ObjectHideFlags: 0
@@ -1181,6 +1194,7 @@ GameObject:
   - component: {fileID: 886314440}
   - component: {fileID: 886314445}
   - component: {fileID: 886314444}
+  - component: {fileID: 886314446}
   m_Layer: 0
   m_Name: Ally 1 (2)
   m_TagString: Untagged
@@ -1324,6 +1338,20 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &886314446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886314439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 302312cd029aa934baae2d2f2fefa2c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AgentStateMachine
+  querySystem: {fileID: 8438924}
+  threatTransform: {fileID: 111367333}
 --- !u!1 &1821870727
 GameObject:
   m_ObjectHideFlags: 0
@@ -1338,6 +1366,7 @@ GameObject:
   - component: {fileID: 1821870728}
   - component: {fileID: 1821870733}
   - component: {fileID: 1821870732}
+  - component: {fileID: 1821870734}
   m_Layer: 0
   m_Name: Ally 1
   m_TagString: Untagged
@@ -1481,6 +1510,20 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1821870734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1821870727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 302312cd029aa934baae2d2f2fefa2c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AgentStateMachine
+  querySystem: {fileID: 8438924}
+  threatTransform: {fileID: 111367333}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
