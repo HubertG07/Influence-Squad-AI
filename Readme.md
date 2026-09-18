@@ -41,12 +41,12 @@ Breakdown of the time invested during development
 | **15th Sept 2026** | 12:36-13:45 & 14:50-15:50 | 2 hour 9 mins | Batched raycast physics for cover & line of sight occlusion |
 | **16th Sept 2026** | 19:00-20:30 | 1 hour 30 mins | Squad Coordinator & Utility Engine |
 | **17th Sept 2026** | 12:40-14:46 | 2 hrs 6 mins | State Machines, Combat Behaviours & Unity Editor Tools Menu |
-| **18th Sept 2026** | 10:22- | TBD | Working editor tools & Improved AI |
-| **Future** | TBD | TBD | Make the editor tools work & update the AI to improve it | 
+| **18th Sept 2026** | 10:22-11:44 & TBD | 1 hr 22 mins | Working editor tools & Improved AI & Scene Showcase Setup |
+| **Future** | TBD | TBD | Possibly tweak the variables for a more intuitive experience | 
 
 * **Project Start Date:** September 14th 2026
 * **Project Finish Date:** Not finished yet
-* **Current Total Time:** 7 hrs 07 mins Hours (Ongoing)
+* **Current Total Time:** 8 hrs 29 mins Hours (Ongoing)
 ---
 
 ## Technical Breakdown & Architecture
@@ -104,11 +104,15 @@ Currently the pipeline operates on a modular, data-oriented workflow
 ### 2. NavMesh Pacing Race Condition
 * **Problem:** Setting `navAgent.SetDestination()` doesn't update the `remainingDistance` immediately on the first frame, causing `remainingDistance <= arrivalDistance` to be triggered prematurely and freeze the agents.
 * **Solution:** Updated the evaluation guard to explicitly verify `!navAgent.pathPending && navAgent.hasPath` before evaluating the arrival distance threshold
+### 3. Sightline Blindness
+* **Problem:** When the threat position gets shifted, the agents were trapped in their local search rings where every close by cell scored terribly. The nearby options failed to beat the hysteresis delta, so agents either froze or moved to close by low quality squares near the threat.
+* **Solution:** Implemented an emergency override (`isExposedInDanger`) that bypasses the `scoreThresholdDelta` when the agent is caught in the open, forcing repathing to further cover cells. 
 
 ## Takeaways & Learnings
 1. **Flattened Memory Arrays:** Traversing multi-dimensional arrays caused object overhead. Using a 1D flat array ($$\text{Index} = X + Z \times \text{Width}$$) to optimise the memory layout.
 2. **Decoupling Data Processing:** Seperating heatmap generation from agent path consumption using a query to keep the systems modular.
 3. **Pre-Allocated FSM Design:** Instantiate the state interfaces once into a lookup table eliminiating allocation during transitions.
+4. **Non Linear Threat Scaling:** Linear calculations allow dangerous open ground near the enemy to score similar to open ground further away. Exponential falloffs were necessary to force agents to flee from threats when cover wasnt adjacent
 ---
 
 ## How to Run & Usage
