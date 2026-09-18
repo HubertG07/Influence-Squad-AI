@@ -41,6 +41,7 @@ Breakdown of the time invested during development
 | **15th Sept 2026** | 12:36-13:45 & 14:50-15:50 | 2 hour 9 mins | Batched raycast physics for cover & line of sight occlusion |
 | **16th Sept 2026** | 19:00-20:30 | 1 hour 30 mins | Squad Coordinator & Utility Engine |
 | **17th Sept 2026** | 12:40-14:46 | 2 hrs 6 mins | State Machines, Combat Behaviours & Unity Editor Tools Menu |
+| **18th Sept 2026** | 10:22- | TBD | Working editor tools & Improved AI |
 | **Future** | TBD | TBD | Make the editor tools work & update the AI to improve it | 
 
 * **Project Start Date:** September 14th 2026

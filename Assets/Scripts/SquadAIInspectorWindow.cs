@@ -15,6 +15,25 @@ public class SquadAIInspectorWindow : EditorWindow
     private ScrollView agentListScrollView;
 
     [MenuItem("Window/AI/Squad AI Inspector")]
+
+    void OnEnable()
+    {
+        EditorApplication.update += OnEditorUpdate;
+    }
+
+    void OnDisable()
+    {
+        EditorApplication.update -= OnEditorUpdate;
+    }
+
+    private void OnEditorUpdate()
+    {
+        if (Application.isPlaying)
+        {
+            Repaint();
+        }
+    }
+
     public static void ShowWindow()
     {
         SquadAIInspectorWindow wnd = GetWindow<SquadAIInspectorWindow>();
@@ -74,7 +93,7 @@ public class SquadAIInspectorWindow : EditorWindow
         root.Add(agentListScrollView);
     }
 
-    private void OnspectorUpdate()
+    private void OnInspectorUpdate()
     {
         if (!Application.isPlaying) return;
 
