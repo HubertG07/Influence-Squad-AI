@@ -67,6 +67,31 @@ public class SquadCoordinator : MonoBehaviour
         currentContext.totalActiveMembers = squadMembers.Count;
         currentContext.averageDistanceToThreat = totalDist / squadMembers.Count;
 
+        if (squadMembers.Count > 1)
+        {
+            float totalInterDistance = 0f;
+            int pairCount = 0;
+
+            for (int i = 0; i < squadMembers.Count; i++)
+            {
+                for (int j = i + 1; j < squadMembers.Count; j++)
+                {
+                    totalInterDistance += Vector3.Distance(
+                        squadMembers[i].transform.position,
+                        squadMembers[j].transform.position
+                    );
+                    pairCount++;
+                }
+            }
+
+            float avgInterDistance = totalInterDistance / pairCount;
+            currentContext.SquadClusteringScore = Mathf.Clamp01(1.0f - (avgInterDistance / 10.0f));
+        }
+        else
+        {
+            currentContext.SquadClusteringScore = 0f;
+        }
+
         // Proximity Urgency
         float proximityScore = 1.0f - UtilityEngine.Logistic(currentContext.averageDistanceToThreat, midpoint: 15f, steepness: 0.3f);
 
