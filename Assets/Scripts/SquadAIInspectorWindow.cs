@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
 
 public class SquadAIInspectorWindow : EditorWindow
 {
@@ -13,6 +14,8 @@ public class SquadAIInspectorWindow : EditorWindow
     private ProgressBar clusterDensityBar;
     private Label roleBreakdownLabel;
     private ScrollView agentListScrollView;
+
+    private List<AgentCardUI> cachedAgentCards = new List<AgentCardUI>();
 
     [MenuItem("Window/AI/Squad AI Inspector")]
 
@@ -137,33 +140,62 @@ public class SquadAIInspectorWindow : EditorWindow
 
         roleBreakdownLabel.text = $"Roles: Flankers: {flankers} | Suppressors: {suppressors} | Default Cover: {defaultCover}";
 
-        agentListScrollView.Clear();
-        foreach (var agent in activeCoordinator.squadMembers)
+        int activeCount = activeCoordinator.squadMembers.Count;
+
+        while (cachedAgentCards.Count < activeCount)
         {
-            if (agent == null) continue;
+            AgentCardUI newCard = new AgentCardUI();
+            cachedAgentCards.Add(newCard);
+            agentListScrollView.Add(newCard.RootElement);
+        }
 
-            AgentStateMachine fsm = agent.GetComponent<AgentStateMachine>();
-            string stateName = fsm != null ? fsm.CurrentStateType.ToString() : "N/A";
+        for (int i = 0; i < cachedAgentCards.Count; i++)
+        {
+            if (i < activeCount)
+            {
+                var agent = activeCoordinator.squadMembers[i];
+                if (agent == null) continue;
 
-            VisualElement card = new VisualElement();
-            card.style.paddingLeft = 8;
-            card.style.paddingRight = 8;
-            card.style.paddingTop = 6;
-            card.style.paddingBottom = 6;
-            card.style.marginBottom = 4;
-            card.style.backgroundColor = new Color(0.22f, 0.22f, 0.22f, 0.8f);
-            card.style.borderBottomLeftRadius = 4;
-            card.style.borderBottomRightRadius = 4;
+                AgentStateMachine fsm = agent.GetComponent<AgentStateMachine>();
+                string stateName = fsm != null ? fsm.CurrentStateType.ToString() : "N/A";
 
-            Label nameLabel = new Label($"{agent.name} — Role: [{agent.CurrentRole}] — State: [{stateName}]");
-            nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                cachedAgentCards[i].NameLabel.text = $"{agent.name} — Role: [{agent.CurrentRole}] — State: [{stateName}]";
+                cachedAgentCards[i].PosLabel.text = $"Target Destination: {agent.TargetDestination}";
+                cachedAgentCards[i].RootElement.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                cachedAgentCards[i].RootElement.style.display = DisplayStyle.None;
+            }
+        }
+    }
 
-            Label posLabel = new Label($"Target Destination: {agent.TargetDestination}");
-            posLabel.style.fontSize = 11;
+    private class AgentCardUI
+    {
+        public VisualElement RootElement;
+        public Label NameLabel;
+        public Label PosLabel;
 
-            card.Add(nameLabel);
-            card.Add(posLabel);
-            agentListScrollView.Add(card);
+        public AgentCardUI()
+        {
+            RootElement = new VisualElement();
+            RootElement.style.paddingLeft = 8;
+            RootElement.style.paddingRight = 8;
+            RootElement.style.paddingTop = 6;
+            RootElement.style.paddingBottom = 6;
+            RootElement.style.marginBottom = 4;
+            RootElement.style.backgroundColor = new Color(0.22f, 0.22f, 0.22f, 0.8f);
+            RootElement.style.borderBottomLeftRadius = 4;
+            RootElement.style.borderBottomRightRadius = 4;
+
+            NameLabel = new Label();
+            NameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+
+            PosLabel = new Label();
+            PosLabel.style.fontSize = 11;
+
+            RootElement.Add(NameLabel);
+            RootElement.Add(PosLabel);
         }
     }
 }
