@@ -51,7 +51,6 @@ public class TacticalAgentMovement : MonoBehaviour
             if (navAgent.remainingDistance <= arrivalDistance)
             {
                 isMovingToTarget = false;
-                currentTargetScore = -1f;
             }
         }
 
@@ -66,11 +65,16 @@ public class TacticalAgentMovement : MonoBehaviour
     {
         float currentSpotScore = querySytem.GetScoreAtPosition(transform.position);
 
-        // Evaluate the current position to see if its degraded
-        if (currentTargetScore >= 0f)
+        if (isMovingToTarget)
         {
             currentTargetScore = querySytem.GetScoreAtPosition(currentTargetPosition);
         }
+        else
+        {
+            currentTargetScore = currentSpotScore;
+        }
+
+        bool isExposedInDanger = currentSpotScore < 0.35f;
 
         // Query for a new best position
         if (querySytem.TryFindBestPosition(
@@ -82,14 +86,20 @@ public class TacticalAgentMovement : MonoBehaviour
             ref lastEvaluatedCandidates
         ))
         {
-            float compareScore = isMovingToTarget ? currentTargetScore : currentSpotScore;
+            float pathDistance = Vector3.Distance(transform.position, candiatePosition);
+            float distancePenalty = pathDistance * 0.01f;
+            float adjustedCandiadateScore = candidateScore - distancePenalty;
 
-            // Only move if the its better than current position
-            if (candidateScore > (compareScore + scoreThresholdDelta))
+            // Emergency Override
+            float requiredDelta = isExposedInDanger ? 0.05f : scoreThresholdDelta;
+
+            if (adjustedCandiadateScore > (currentTargetScore + requiredDelta))
             {
                 currentTargetPosition = candiatePosition;
                 currentTargetScore = candidateScore;
                 isMovingToTarget = true;
+
+                navAgent.stoppingDistance = candidateScore > 0.8f ? 0.4f : arrivalDistance;
 
                 navAgent.SetDestination(currentTargetPosition);
             }

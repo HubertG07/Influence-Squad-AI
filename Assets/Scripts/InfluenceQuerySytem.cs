@@ -56,8 +56,36 @@ public class InfluenceQuerySytem : MonoBehaviour
 
         GridSettings settings = gridManager.Settings;
         NativeArray<float> combinedMap = gridManager.CombinedMap;
+        NativeArray<float> coverMap = gridManager.CoverMap;
 
         if (!combinedMap.IsCreated) return false;
+
+        int currentCellIndex = settings.WorldToIndex(agentPosition);
+        bool isCurrentlyInCover = coverMap.IsCreated && coverMap[currentCellIndex] > 0.5f;
+
+        Vector3 searchCenter = agentPosition;
+
+        if (!isCurrentlyInCover)
+        {
+            float bestGlobalCoverScore = 0f;
+            Vector3 bestGlobalCoverPos = agentPosition;
+
+            for (int i = 0; i < settings.TotalCells; i += 4)
+            {
+                if (combinedMap[i] > bestGlobalCoverScore)
+                {
+                    bestGlobalCoverScore = combinedMap[i];
+                    int2 gPos = settings.IndexToGrid(i);
+                    bestGlobalCoverPos = settings.GridToWorld(gPos.x, gPos.y);
+                }
+            }
+
+            if (bestGlobalCoverScore > 0.8f)
+            {
+                Vector3 dirToCover = (bestGlobalCoverPos - agentPosition).normalized;
+                searchCenter = agentPosition + (dirToCover * (searchRadius * 0.5f));
+            }
+        }
 
         // Conver the Agent position to the grid center
         int centerIndex = settings.WorldToIndex(agentPosition);

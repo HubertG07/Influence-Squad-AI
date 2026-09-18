@@ -73,9 +73,9 @@ public struct CombineMapsJob : IJobParallelFor
         float cover = math.clamp(coverMap[index] * coverWeight, 0f, 1f);
         float allyDensity = math.clamp(allyDensityMap[index] * allyWeight, 0f, 1f);
 
-        float openGroundSafety = 0.70f;
+        float openGroundSafety = 0.50f;
 
-        float directThreatSafety = openGroundSafety * (1f - threat);
+        float directThreatSafety = openGroundSafety * math.pow((1f - threat), 2f);
 
         float finalSafety = math.select(directThreatSafety, 1.0f, cover > 0.5f);
 
@@ -109,7 +109,7 @@ public struct CalculateAllyDensityJob : IJobParallelFor
         for (int i = 0; i < allyPositions.Length; i++)
         {
             float dist = math.distance(cellPos, allyPositions[i]);
-            if (dist < maxClusterRadius)
+            if (dist > 0.3f && dist < maxClusterRadius)
             {
                 totalDensity += 1f - (dist / maxClusterRadius);
             }
