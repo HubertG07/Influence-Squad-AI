@@ -69,13 +69,17 @@ public struct CombineMapsJob : IJobParallelFor
 
     public void Execute(int index)
     {
-        float threat = threatMap[index];
-        float cover = coverMap[index];
-        float allyDensity = allyDensityMap[index];
+        float threat = math.clamp(threatMap[index] * threatWeight, 0f, 1f);
+        float cover = math.clamp(coverMap[index] * coverWeight, 0f, 1f);
+        float allyDensity = math.clamp(allyDensityMap[index] * allyWeight, 0f, 1f);
 
-        // Priotize cover while still avoiding threats & crowding
-        float score = (cover * coverWeight) * (1f - (threat * threatWeight)) * (1f - (allyDensity * allyWeight));
+        float openGroundSafety = 0.70f;
 
+        float directThreatSafety = openGroundSafety * (1f - threat);
+
+        float finalSafety = math.select(directThreatSafety, 1.0f, cover > 0.5f);
+
+        float score = finalSafety - (allyDensity * 0.2f);
         combinedMap[index] = math.clamp(score, 0f, 1f);
     }
 }
