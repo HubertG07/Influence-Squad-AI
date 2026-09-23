@@ -3,9 +3,14 @@
 ---
 
 ## Preview & Demo
+![AI Demo](Media/ai_demo.gif)
 
 
 *Demonstation of the the map processing and AI.
+
+![Heatmap Demo](Media/heatmap_demo.gif)
+
+*Demonstration of the heatmaps (Combined, Threat, Cover, Ally Density)
 ---
 
 ## Project Overview & Summary
@@ -42,11 +47,11 @@ Breakdown of the time invested during development
 | **16th Sept 2026** | 19:00-20:30 | 1 hour 30 mins | Squad Coordinator & Utility Engine |
 | **17th Sept 2026** | 12:40-14:46 | 2 hrs 6 mins | State Machines, Combat Behaviours & Unity Editor Tools Menu |
 | **18th Sept 2026** | 10:22-11:44 & TBD | 1 hr 22 mins | Working editor tools & Improved AI & Scene Showcase Setup |
-| **Future** | TBD | TBD | Possibly tweak the variables for a more intuitive experience | 
+| **Future Updates/Improvements** | TBD | TBD | Possibly tweak the variables for a more intuitive experience | 
 
 * **Project Start Date:** September 14th 2026
-* **Project Finish Date:** Not finished yet
-* **Current Total Time:** 8 hrs 29 mins Hours (Ongoing)
+* **Project Finish Date:** September 18th 2026
+* **Current Total Time:** 8 hrs 29 mins Hours (Finished)
 ---
 
 ## Technical Breakdown & Architecture

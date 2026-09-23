@@ -18,24 +18,58 @@ public class InfluenceGridVisualizer : MonoBehaviour
     [SerializeField] private bool showHeatmap = true;
     [SerializeField] private bool showCellScores = false;
     [SerializeField] private HeatmapVisualizationMode displayMode = HeatmapVisualizationMode.Combined;
-    [SerializeField, Range(0.05f, 1.0f)] private float cellHeightOffset = 0.05f;
+    [SerializeField, Range(0.001f, 0.5f)] private float cellHeightOffset = 0.05f;
 
     [Header("Colour Gradients")]
-    [SerializeField] private Gradient scoreGraident;
+    [SerializeField] private Gradient scoreGradient;
 
     private InfluenceGridManager gridManager;
+    private Mesh quadMesh;
+    private Material heatmapMaterial;
+    private MaterialPropertyBlock propertyBlock;
 
     void OnEnable()
     {
         gridManager = GetComponent<InfluenceGridManager>();
         InitializeDefaultGradients();
+        InitializeResources();
+    }
+
+    private void InitializeResources()
+    {
+        if (quadMesh == null)
+        {
+            quadMesh = new Mesh();
+            quadMesh.vertices = new Vector3[]
+            {
+                new Vector3(-0.5f, 0, -0.5f),
+                new Vector3( 0.5f, 0, -0.5f),
+                new Vector3(-0.5f, 0,  0.5f),
+                new Vector3( 0.5f, 0,  0.5f)
+            };
+            quadMesh.triangles = new int[] { 0, 2, 1, 2, 3, 1 };
+            quadMesh.normals = new Vector3[] { Vector3.up, Vector3.up, Vector3.up, Vector3.up };
+            quadMesh.RecalculateBounds();
+        }
+
+        if (heatmapMaterial == null)
+        {
+            Shader shader = Shader.Find("Sprites/Default"); 
+            if (shader == null) shader = Shader.Find("Unlit/Transparent");
+            heatmapMaterial = new Material(shader);
+        }
+
+        if (propertyBlock == null)
+        {
+            propertyBlock = new MaterialPropertyBlock();
+        }
     }
 
     private void InitializeDefaultGradients()
     {
-        if (scoreGraident == null || scoreGraident.colorKeys.Length == 0)
+        if (scoreGradient == null || scoreGradient.colorKeys.Length == 0)
         {
-            scoreGraident = new Gradient();
+            scoreGradient = new Gradient();
             GradientColorKey[] colors = new GradientColorKey[3];
             colors[0] = new GradientColorKey(Color.red, 0.0f);     // High Threat / Bad Score
             colors[1] = new GradientColorKey(Color.yellow, 0.5f);  // Neutral
@@ -43,19 +77,26 @@ public class InfluenceGridVisualizer : MonoBehaviour
             GradientAlphaKey[] alphas = new GradientAlphaKey[2];
             alphas[0] = new GradientAlphaKey(0.45f, 0.0f);
             alphas[1] = new GradientAlphaKey(0.45f, 1.0f);
-            scoreGraident.SetKeys(colors, alphas);
+            scoreGradient.SetKeys(colors, alphas);
         }
     }
 
-    void OnDrawGizmos()
+    void Update()
     {
         if (!showHeatmap || gridManager == null || !Application.isPlaying) return;
 
+        RenderHeatmapMesh();
+    }
+
+    private void RenderHeatmapMesh()
+    {
         GridSettings settings = gridManager.Settings;
         NativeArray<float> activeMap = GetActiveMapData();
-        if (activeMap == null || activeMap.Length == 0) return;
+        if (!activeMap.IsCreated || activeMap.Length == 0) return;
 
-        Vector3 cellSize = new Vector3(settings.cellSize * 0.95f, 0.02f, settings.cellSize * 0.95f);
+        InitializeResources();
+
+        Vector3 scale = new Vector3(settings.cellSize * 0.95f, 1f, settings.cellSize * 0.95f);
 
         for (int x = 0; x < settings.width; x++)
         {
@@ -65,6 +106,7 @@ public class InfluenceGridVisualizer : MonoBehaviour
                 if (index < 0 || index >= activeMap.Length) continue;
 
                 float rawScore = activeMap[index];
+                if (rawScore <= 0.001f) continue;
 
                 float colorEvaluationScore = (displayMode == HeatmapVisualizationMode.Threat) 
                     ? 1.0f - Mathf.Clamp01(rawScore) 
@@ -73,12 +115,39 @@ public class InfluenceGridVisualizer : MonoBehaviour
                 Vector3 worldPos = settings.GridToWorld(x, z);
                 worldPos.y += cellHeightOffset;
 
-                Gizmos.color = scoreGraident.Evaluate(colorEvaluationScore);
-                Gizmos.DrawCube(worldPos, cellSize);
+                Matrix4x4 matrix = Matrix4x4.TRS(worldPos, Quaternion.identity, scale);
+                Color cellColor = scoreGradient.Evaluate(colorEvaluationScore);
 
-                if (showCellScores && rawScore > 0.01f)
+                propertyBlock.SetColor("_Color", cellColor);
+                Graphics.DrawMesh(quadMesh, matrix, heatmapMaterial, 0, null, 0, propertyBlock);
+            }
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        if (!showHeatmap || gridManager == null || !Application.isPlaying) return;
+
+        GridSettings settings = gridManager.Settings;
+        NativeArray<float> activeMap = GetActiveMapData();
+        if (!activeMap.IsCreated || activeMap.Length == 0) return;
+
+        if (showCellScores)
+        {
+            for (int x = 0; x < settings.width; x++)
+            {
+                for (int z = 0; z < settings.height; z++)
                 {
-                    Handles.Label(worldPos, rawScore.ToString("F2"), EditorStyles.miniLabel);
+                    int index = settings.GridToIndex(x, z);
+                    if (index < 0 || index >= activeMap.Length) continue;
+
+                    float rawScore = activeMap[index];
+                    if (rawScore > 0.01f)
+                    {
+                        Vector3 worldPos = settings.GridToWorld(x, z);
+                        worldPos.y += cellHeightOffset;
+                        Handles.Label(worldPos, rawScore.ToString("F2"), EditorStyles.miniLabel);
+                    }
                 }
             }
         }
@@ -99,9 +168,11 @@ public class InfluenceGridVisualizer : MonoBehaviour
 
     private void DrawHoverCellInspector()
     {
-        GridSettings settings = gridManager.Settings;
+        if (Event.current == null) return;
 
+        GridSettings settings = gridManager.Settings;
         Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+        
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
             Vector2Int gridPos = settings.WorldToGrid(hit.point);
